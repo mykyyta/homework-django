@@ -8,7 +8,7 @@ def user_page(request):
     return HttpResponse("Hello, world. You're at the polls index.")
 
 def specific_user(request, user_id):
-    return HttpResponse("Hello, world. You're at the polls index.")
+    return HttpResponse(f"Hello, {user_id}. You're at the polls index.")
 
 def login_page(request):
     if request.method == "POST":
@@ -38,12 +38,16 @@ def register_page(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
-            user = User.objects.create_user(
+            User.objects.create_user(
                 username=form.cleaned_data['username'],
-                email=form.cleaned_data['email'],
-                password=form.cleaned_data['password']
+                password = form.cleaned_data['password'],
+                first_name = form.cleaned_data['first_name'],
+                last_name = form.cleaned_data['last_name'],
+                email = form.cleaned_data['email'],
             )
-        return redirect('login_page')
+            return redirect('login_page')
+        else:
+            return render(request, 'register.html', {'form': form})
     else:
         form = RegisterForm()
         return render(request, 'register.html', {'form': form})
