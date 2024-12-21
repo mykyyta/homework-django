@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-import users.views
+import users.views, trainer.views
 
 urlpatterns = [
     path('', users.views.index_page, name='index_page'),
@@ -28,4 +28,5 @@ urlpatterns = [
     path("login/", users.views.login_page, name="login_page"),
     path("logout/", users.views.logout_page, name="logout_page"),
     path("register/", users.views.register_page, name="register_page"),
+    path('service/', trainer.views.service, name='service')
 ]
