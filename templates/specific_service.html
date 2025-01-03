@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Service page</title>
+</head>
+<body>
+<h1>Service info</h1>
+{{ service_obj.category.name }}<br>
+{{ service_obj.trainer.username}}<br>
+{{ service_obj.price }}<br>
+{{ service_obj.level }}<br>
+{{ service_obj.duration }}<br>
+<br>
+<form method="POST">
+    {% csrf_token %}
+    <label for="training_start">Choose time slot:</label>
+    <select id="training_start" name="training_start">
+            {% for slot in free_slots_list %}
+                <option value="{{ slot }}">{{ slot }}</option>
+            {% endfor %}
+    </select>
+    <br><br>
+    <button type="submit">Submit</button>
+</form>
+</body>
+</html>

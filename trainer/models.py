@@ -12,6 +12,7 @@ class TrainerSchedule(models.Model):
     datetime_end = models.DateTimeField()
     trainer = models.ForeignKey(User, on_delete=models.CASCADE)
 
+
 class Category(models.Model):
     name = models.CharField(max_length=50)
 
@@ -21,6 +22,3 @@ class Service(models.Model):
     price = models.DecimalField(max_digits=7, decimal_places=2)
     level = models.CharField(max_length=50)
     duration = models.CharField(max_length=50)
-
-
-

@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Register</title>
+    <title>{{ user_type|capfirst }} Registration</title>
 </head>
 <body>
-    <h2>Register</h2>
+    <h2>Register as a {{ user_type|capfirst }}</h2>
     <form method="POST" action="">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Register</button>
+        <button type="submit">Register as {{ user_type|capfirst }}</button>
     </form>
 </body>
 </html>

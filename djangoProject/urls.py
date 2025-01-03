@@ -27,6 +27,7 @@ urlpatterns = [
     path("booking/", include("booking.urls")),
     path("login/", users.views.login_page, name="login_page"),
     path("logout/", users.views.logout_page, name="logout_page"),
-    path("register/", users.views.register_page, name="register_page"),
+    path('register/', users.views.register_page, {'user_type': 'client'}, name='register_page'),
+    path('register/trainer/', users.views.register_page, {'user_type': 'trainer'}, name='register_trainer'),
     path('service/', trainer.views.service, name='service')
 ]

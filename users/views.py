@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.shortcuts import render, redirect
 from .forms import RegisterForm
 
@@ -34,23 +34,25 @@ def logout_page(request):
         return redirect('index_page')
     return HttpResponse("You are not logged in")
 
-def register_page(request):
+def register_page(request, user_type):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
-            User.objects.create_user(
+            user = User.objects.create_user(
                 username=form.cleaned_data['username'],
                 password = form.cleaned_data['password'],
                 first_name = form.cleaned_data['first_name'],
                 last_name = form.cleaned_data['last_name'],
                 email = form.cleaned_data['email'],
-            )
+                )
+            group_name = 'trainer' if user_type == 'trainer' else 'client'
+            user.groups.add(Group.objects.get(name=group_name))
             return redirect('login_page')
         else:
             return render(request, 'register.html', {'form': form})
     else:
         form = RegisterForm()
-        return render(request, 'register.html', {'form': form})
+        return render(request, 'register.html', {'form': form, 'user_type': user_type})
 
 def index_page(request):
     return render(request, 'index.html')
