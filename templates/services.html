@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services</title>
+</head>
+<body>
+    <h1>Services List</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Service Name</th>
+                <th>Category</th>
+                <th>Trainer</th>
+                <th>Price</th>
+                <th>Level</th>
+                <th>Duration</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for service in selected_services %}
+            <tr>
+                <td><a href="{% url 'specific_service' service.id %}">{{ service.name }}</a></td>
+                <td>{{ service.category.name }}</td>
+                <td><a href="{% url 'specific_trainer' service.trainer.id %}">{{ service.trainer.username }}</a></td>
+                <td>{{ service.price }}</td>
+                <td>{{ service.level }}</td>
+                <td>{{ service.duration }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h1>Post a New Service</h1>
+
+    {% load custom_filters %}
+    {% if user|has_group:"trainer" %}
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Post Service</button>
+        </form>
+    {% else %}
+        <p>You must be a trainer to post a service.</p>
+    {% endif %}
+</body>
+</html>

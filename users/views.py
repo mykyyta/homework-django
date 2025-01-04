@@ -34,7 +34,7 @@ def logout_page(request):
         return redirect('index_page')
     return HttpResponse("You are not logged in")
 
-def register_page(request, user_type):
+def register(request, user_type):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():

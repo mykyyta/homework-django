@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trainers</title>
+</head>
+<body>
+    <h1>Trainers List</h1>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Description</th>
+                <th>Categories</th>
+                <th>Services</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for trainer in trainers %}
+                <tr>
+                    <!-- Username -->
+                    <td>
+                        <a href="{% url 'specific_trainer' trainer.id %}">{{ trainer.username }}</a>
+                    </td>
+
+
+                    <!-- Description -->
+                    <td>
+                        {% if trainer.description %}
+                            {{ trainer.description.name }}
+                        {% else %}
+                            No description available.
+                        {% endif %}
+                    </td>
+
+                    <!-- Categories -->
+                    <td>
+                        {% with trainer.services.all as services %}
+                            {% if services %}
+                                {% for service in services %}
+                                    {{ service.category.name }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                No categories available.
+                            {% endif %}
+                        {% endwith %}
+                    </td>
+
+                    <!-- Services -->
+                    <td>
+                        {% if trainer.services.all %}
+                            {% for service in trainer.services.all %}
+                                <a href="{% url 'specific_service' service.id %}">{{ service.name }}</a>
+                                {% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            No services available.
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">No trainers found.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>

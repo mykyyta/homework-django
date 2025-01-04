@@ -24,10 +24,11 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("user/", include("users.urls")),
     path("trainer/", include("trainer.urls")),
-    path("booking/", include("booking.urls")),
+    path("bookings/", include("booking.urls")),
     path("login/", users.views.login_page, name="login_page"),
     path("logout/", users.views.logout_page, name="logout_page"),
-    path('register/', users.views.register_page, {'user_type': 'client'}, name='register_page'),
-    path('register/trainer/', users.views.register_page, {'user_type': 'trainer'}, name='register_trainer'),
-    path('service/', trainer.views.service, name='service')
+    path('register/', users.views.register, {'user_type': 'client'}, name='register_page'),
+    path('register/trainer/', users.views.register, {'user_type': 'trainer'}, name='register_trainer'),
+    path('services/', trainer.views.services, name='services'),
+    path('services/<service_id>/', trainer.views.specific_service, name='specific_service'),
 ]

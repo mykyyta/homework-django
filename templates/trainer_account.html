@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Your Trainer account</title>
+</head>
+<body>
+    <h2>Your Trainer account</h2>
+
+    <h3>Trainer Description</h3>
+        {% if trainer.description %}
+            <p>{{ trainer.description.name }}</p>
+        {% else %}
+            <p>No description available.</p>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            {{ trainer_description_form.as_p }}
+            <button type="submit" name="trainer_description">Submit Trainer Description</button>
+        </form>
+
+    <h3>Trainer Schedule</h3>
+        {% if trainer.schedule %}
+            <ul>
+                {% for entry in trainer.schedule.all %}
+                    <li>{{ entry.datetime_start }} to {{ entry.datetime_end }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No schedule available.</p>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            {{ trainer_schedule_form.as_p }}
+            <button type="submit" name="trainer_schedule">Submit Trainer Schedule</button>
+        </form>
+
+    <h3>Trainer Service</h3>
+        {% if trainer.services.all %}
+            {% for service in trainer.services.all %}
+                <a href="{% url 'specific_service' service.id %}">{{ service.name }}</a>
+                {% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        {% else %}
+            No services available.
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            {{ service_form.as_p }}
+            <button type="submit" name="service">Submit Trainer Service</button>
+        </form>
+
+</body>
+</html>
