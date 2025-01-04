@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ trainer.username }} - Trainer Details</title>
+</head>
+<body>
+
+    <h1>Trainer {{ trainer.username }}</h1>
+
+    {% if trainer.description %}
+        <h2>Description</h2>
+        <p>{{ trainer.description.name }}</p>
+    {% else %}
+        <p>No description available.</p>
+    {% endif %}
+
+    <h2>Schedule</h2>
+    {% if trainer.schedule %}
+        <ul>
+            {% for entry in trainer.schedule.all %}
+                <li>{{ entry.datetime_start }} - {{ entry.datetime_end }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No schedule available.</p>
+    {% endif %}
+
+    <h2>Services</h2>
+    {% if trainer.services %}
+        <ul>
+            {% for service in trainer.services.all %}
+                <li>{{ service.name }} - ${{ service.price }} - {{ service.level }} - {{ service.duration }} mins</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No services available.</p>
+    {% endif %}
+
+</body>
+</html>

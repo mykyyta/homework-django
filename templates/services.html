@@ -32,7 +32,7 @@
         </tbody>
     </table>
 
-    <h1>Post a New Service</h1>
+    <h1>Post New Service</h1>
 
     {% load custom_filters %}
     {% if user|has_group:"trainer" %}
@@ -42,7 +42,7 @@
             <button type="submit">Post Service</button>
         </form>
     {% else %}
-        <p>You must be a trainer to post a service.</p>
+        <p>You must be trainer to post service.</p>
     {% endif %}
 </body>
 </html>

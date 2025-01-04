@@ -1,6 +1,6 @@
 from datetime import timedelta
 from dateutil import parser
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from trainer.forms import ServiceForm, TrainerDescriptionForm, TrainerScheduleForm
@@ -17,6 +17,8 @@ def trainers(request):
 
 
 def specific_trainer(request, trainer_id):
+    if not User.objects.filter(groups__name='trainer', id=trainer_id).exists():
+        return HttpResponse('no such trainer', status=404)
     if request.user == User.objects.get(pk=trainer_id):
         trainer_description_form = TrainerDescriptionForm()
         trainer_schedule_form = TrainerScheduleForm()
@@ -45,26 +47,14 @@ def specific_trainer(request, trainer_id):
                 trainer_schedule_form = TrainerScheduleForm(request.POST)
                 if trainer_schedule_form.is_valid():
                     TrainerSchedule.objects.create(trainer=current_trainer, **trainer_schedule_form.cleaned_data)
-
                     return redirect('specific_trainer', trainer_id)
-
-            elif 'service' in request.POST:
-                service_form = ServiceForm(request.POST)
-                if service_form.is_valid():
-                    Service.objects.create(
-                        name=service_form.cleaned_data['name'],
-                        category=service_form.cleaned_data['category'],
-                        trainer=request.user,
-                        price=service_form.cleaned_data['price'],
-                        level=service_form.cleaned_data['level'],
-                        duration=service_form.cleaned_data['duration'],
-                    )
-                    return redirect('specific_trainer', trainer_id)
-
         return render(request, 'trainer_account.html', {'trainer_description_form': trainer_description_form,
                                                                                 'trainer_schedule_form': trainer_schedule_form,
                                                                                 'service_form': service_form,
                                                                                 "trainer": current_trainer})
+    else:
+        current_trainer = User.objects.get(pk=trainer_id)
+        return render(request, 'specific_trainer.html', {'trainer': current_trainer})
 
 
 def services(request):
@@ -85,8 +75,7 @@ def services(request):
                 level = form.cleaned_data['level'],
                 duration = form.cleaned_data['duration'],
             )
-
-        return redirect('services')
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/services/'))
 
 
 def specific_service(request, service_id):
