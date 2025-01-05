@@ -6,7 +6,7 @@
     <title>{{ trainer.username }} - Trainer Details</title>
 </head>
 <body>
-
+    <a href="{% url 'index_page' %}">Home</a><br>
     <h1>Trainer {{ trainer.username }}</h1>
 
     {% if trainer.description %}

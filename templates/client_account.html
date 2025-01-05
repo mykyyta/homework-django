@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Your Client account<</title>
+</head>
+<body>
+    <a href="{% url 'index_page' %}">Home</a><br>
+    <h2>Your Client account</h2>
+    
+    <h3>Your Bookings</h3>
+        {% if client.bookings_customer %}
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Customer</th>
+                        <th>Service</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in client.bookings_customer.all %}
+                        <tr>
+                            <td>{{ booking.id }}</td>
+                            <td>{{ booking.customer.username }}</td>
+                            <td>{{ booking.service.name }}</td>
+                            <td>{{ booking.datetime_start }}</td>
+                            <td>{{ booking.datetime_end }}</td>
+                            <td>{{ booking.status|yesno:"Active,Inactive" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>You don't have bookings</p>
+        {% endif %}
+
+
+
+</body>
+</html>

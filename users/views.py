@@ -5,10 +5,11 @@ from django.shortcuts import render, redirect
 from .forms import RegisterForm
 
 def user_page(request):
-    return HttpResponse("Hello, world. You're at the polls index.")
+    return redirect('index_page')
 
 def specific_user(request, user_id):
-    return HttpResponse(f"Hello, {user_id}. You're at the polls index.")
+    current_client = User.objects.get(pk=user_id)
+    return render(request, 'client_account.html', {'client':current_client})
 
 def login_page(request):
     if request.method == "POST":

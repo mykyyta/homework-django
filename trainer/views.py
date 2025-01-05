@@ -25,7 +25,6 @@ def specific_trainer(request, trainer_id):
         service_form = ServiceForm()
         current_trainer = request.user
 
-        # Handle POST requests for each form
         if request.method == 'POST':
             if 'trainer_description' in request.POST:
                 try:
@@ -59,7 +58,12 @@ def specific_trainer(request, trainer_id):
 
 def services(request):
     if request.method == 'GET':
-        selected_services = Service.objects.all()
+        trainer_id = request.GET.get('trainer_id')
+
+        if trainer_id:
+            selected_services = Service.objects.filter(trainer_id=trainer_id)
+        else:
+            selected_services = Service.objects.all()
         form = ServiceForm()
         return render(request, 'services.html', {"selected_services": selected_services, "form": form})
     else:

@@ -11,8 +11,9 @@
         <p>Hello, {{ user.username }}!</p>
         {% load custom_filters %}
         {% if user|has_group:"trainer" %}
-            <a href="{% url 'specific_trainer' user.id %}">Your trainer account</a><br>
+            <a href="{% url 'specific_trainer' user.id %}">Trainer account</a><br>
         {% endif %}
+        <a href="{% url 'specific_user' user.id %}">Client account</a><br>
         <a href="{% url 'services' %}">Services</a><br>
         <a href="{% url 'trainers' %}">Trainers</a><br>
         <a href="{% url 'logout_page' %}">Logout</a>
@@ -20,7 +21,9 @@
     {% else %}
         <p>You are not logged in.</p>
         <a href="{% url 'login_page' %}">Login</a> | 
-        <a href="{% url 'register_page' %}">Register</a>
+        <a href="{% url 'register_page' %}">Register Client</a>
+        <a href="{% url 'register_trainer' %}">Register Trainer</a>
+        
     {% endif %}
 </body>
 </html>

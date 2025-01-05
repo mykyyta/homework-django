@@ -4,7 +4,10 @@
     <title>Your Trainer account</title>
 </head>
 <body>
+    <a href="{% url 'index_page' %}">Home</a><br>
     <h2>Your Trainer account</h2>
+    
+    <a href="{% url 'services' %}?trainer_id={{ user.id }}">Your Services</a>
 
     <h3>Your Schedule</h3>
         {% if trainer.schedule %}
@@ -21,21 +24,6 @@
             {% csrf_token %}
             {{ trainer_schedule_form.as_p }}
             <button type="submit" name="trainer_schedule">Submit Trainer Schedule</button>
-        </form>
-
-    <h3>Your Services</h3>
-        {% if trainer.services.all %}
-            {% for service in trainer.services.all %}
-                <a href="{% url 'specific_service' service.id %}">{{ service.name }}</a> <br>
-            {% endfor %}
-        {% else %}
-            No services available.
-        {% endif %}
-        Post New Service <br>
-        <form method="post" action="/services/">
-            {% csrf_token %}
-            {{ service_form.as_p }}
-            <button type="submit" name="service">Submit Trainer Service</button>
         </form>
     
     <h3>Your Bookings</h3>
@@ -78,7 +66,7 @@
         <form method="post">
             {% csrf_token %}
             {{ trainer_description_form.as_p }}
-            <button type="submit" name="trainer_description">Submit Trainer Description</button>
+            <button type="submit" name="trainer_description" >Submit Trainer Description</button>
         </form>
 
 
