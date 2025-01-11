@@ -1,8 +1,10 @@
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse
 from django.contrib.auth.models import User, Group
 from django.shortcuts import render, redirect
-from .forms import RegisterForm
+from .forms import RegisterForm, LoginForm
+
 
 def user_page(request):
     return redirect('index_page')
@@ -13,20 +15,19 @@ def specific_user(request, user_id):
 
 def login_page(request):
     if request.method == "POST":
-        username = request.POST.get('username', 'Guest')
-        password = request.POST.get('password')
-
-        if not username or not password:
-            return HttpResponse("Missing username or password", status=400)
-
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect('index_page')
-        else:
-            return render(request, 'login.html', {'error': 'Invalid username or password.'})
+        login_form = LoginForm(request.POST)
+        if login_form.is_valid():
+            username = login_form.cleaned_data['username']
+            password = login_form.cleaned_data['password']
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('index_page')
+        messages.error(request, "Invalid username or password")
+        return redirect('login_page', )
     else:
-        return render(request, 'login.html')
+        form = LoginForm()
+        return render(request, 'login.html', {'form': form})
 
 
 def logout_page(request):
@@ -39,13 +40,7 @@ def register(request, user_type):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
-            user = User.objects.create_user(
-                username=form.cleaned_data['username'],
-                password = form.cleaned_data['password'],
-                first_name = form.cleaned_data['first_name'],
-                last_name = form.cleaned_data['last_name'],
-                email = form.cleaned_data['email'],
-                )
+            user = User.objects.create_user(**form.cleaned_data)
             group_name = 'trainer' if user_type == 'trainer' else 'client'
             user.groups.add(Group.objects.get(name=group_name))
             return redirect('login_page')

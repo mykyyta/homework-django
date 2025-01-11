@@ -14,14 +14,14 @@
     
     <form method="POST" action="">
         {% csrf_token %}
-        <label for="username">Username:</label>
-        <input type="text" name="username" id="username" required>
-        <br>
-    
-        <label for="password">Password:</label>
-        <input type="password" name="password" id="password" required> <br>
-        
+        {{ form.as_p }}
         <button type="submit">Login</button>
     </form>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-danger">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
 </body>
 </html>

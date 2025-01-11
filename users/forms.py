@@ -14,3 +14,7 @@ class RegisterForm(forms.Form):
         if User.objects.filter(username=username).exists():
             raise forms.ValidationError("This username is already taken")
         return username
+
+class LoginForm(forms.Form):
+    username = forms.CharField(max_length=100)
+    password = forms.CharField(widget=forms.PasswordInput)

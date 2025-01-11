@@ -2,19 +2,21 @@ from django import forms
 from .models import Service, TrainerDescription, TrainerSchedule
 
 
+
+
 class ServiceForm(forms.ModelForm):
     class Meta:
         model = Service
         fields = ['name', 'category', 'price', 'level', 'duration']
 
-    LEVEL_CHOICES = [
+    level_choices = [
         ('', 'Select level'),
         ('beginner', 'Beginner'),
         ('intermediate', 'Intermediate'),
         ('advanced', 'Advanced'),
     ]
 
-    level = forms.ChoiceField(choices=LEVEL_CHOICES)
+    level = forms.ChoiceField(choices=level_choices)
 
 
 class TrainerDescriptionForm(forms.ModelForm):

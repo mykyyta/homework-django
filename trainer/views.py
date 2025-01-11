@@ -1,14 +1,13 @@
 from datetime import timedelta
 from dateutil import parser
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
-from django.shortcuts import render, redirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from trainer.forms import ServiceForm, TrainerDescriptionForm, TrainerScheduleForm
 from trainer.models import *
 from booking.models import Booking as BookingModel
 from trainer.utils import free_slots
 from django.contrib.auth.models import User
-
 
 def trainers(request):
     if request.method == 'GET':
@@ -17,29 +16,21 @@ def trainers(request):
 
 
 def specific_trainer(request, trainer_id):
-    if not User.objects.filter(groups__name='trainer', id=trainer_id).exists():
-        return HttpResponse('no such trainer', status=404)
-    if request.user == User.objects.get(pk=trainer_id):
-        trainer_description_form = TrainerDescriptionForm()
-        trainer_schedule_form = TrainerScheduleForm()
-        service_form = ServiceForm()
-        current_trainer = request.user
-
+    current_trainer = get_object_or_404(User, groups__name='trainer', pk=trainer_id)
+    if current_trainer != request.user:
+        return render(request, 'specific_trainer.html', {'trainer': current_trainer})
+    else:
         if request.method == 'POST':
             if 'trainer_description' in request.POST:
-                try:
-                    trainer_description = TrainerDescription.objects.get(trainer=current_trainer)
-                except TrainerDescription.DoesNotExist:
-                    trainer_description = None
-
                 trainer_description_form = TrainerDescriptionForm(request.POST)
-
                 if trainer_description_form.is_valid():
-                    if trainer_description:
+                    trainer_description, created = TrainerDescription.objects.get_or_create(
+                                                                    trainer=current_trainer,
+                                                                    defaults=trainer_description_form.cleaned_data
+                                                                    )
+                    if not created:
                         trainer_description.name = trainer_description_form.cleaned_data['name']
                         trainer_description.save()
-                    else:
-                        TrainerDescription.objects.create(trainer=current_trainer, **trainer_description_form.cleaned_data)
                     return redirect('specific_trainer', trainer_id)
 
             elif 'trainer_schedule' in request.POST:
@@ -47,43 +38,38 @@ def specific_trainer(request, trainer_id):
                 if trainer_schedule_form.is_valid():
                     TrainerSchedule.objects.create(trainer=current_trainer, **trainer_schedule_form.cleaned_data)
                     return redirect('specific_trainer', trainer_id)
-        return render(request, 'trainer_account.html', {'trainer_description_form': trainer_description_form,
+        else:
+            trainer_description_form = TrainerDescriptionForm()
+            trainer_schedule_form = TrainerScheduleForm()
+            service_form = ServiceForm()
+            return render(request, 'trainer_account.html', {'trainer_description_form': trainer_description_form,
                                                                                 'trainer_schedule_form': trainer_schedule_form,
                                                                                 'service_form': service_form,
-                                                                                "trainer": current_trainer})
-    else:
-        current_trainer = User.objects.get(pk=trainer_id)
-        return render(request, 'specific_trainer.html', {'trainer': current_trainer})
+                                                                                'trainer': current_trainer})
 
 
 def services(request):
-    if request.method == 'GET':
-        trainer_id = request.GET.get('trainer_id')
+    is_trainer = request.user.groups.filter(name='trainer').exists()
+    trainer_id = request.GET.get('trainer_id')
+    selected_services = Service.objects.filter(trainer_id=trainer_id) if trainer_id else Service.objects.all()
 
-        if trainer_id:
-            selected_services = Service.objects.filter(trainer_id=trainer_id)
-        else:
-            selected_services = Service.objects.all()
-        form = ServiceForm()
+    if request.method == 'GET':
+        form = ServiceForm() if is_trainer else None
         return render(request, 'services.html', {"selected_services": selected_services, "form": form})
-    else:
-        if not request.user.groups.filter(name='trainer').exists():
-            return JsonResponse({"error": "Permission denied"}, status=403)
+
+    if request.method == 'POST' and is_trainer:
         form = ServiceForm(request.POST)
         if form.is_valid():
-            Service.objects.create(
-                name = form.cleaned_data['name'],
-                category = form.cleaned_data['category'],
-                trainer = request.user,
-                price = form.cleaned_data['price'],
-                level = form.cleaned_data['level'],
-                duration = form.cleaned_data['duration'],
-            )
+            service = form.save(commit=False)
+            service.trainer = request.user
+            service.save()
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/services/'))
+
+    return HttpResponseForbidden("Permission denied")
 
 
 def specific_service(request, service_id):
-    service_obj = Service.objects.get(id=service_id)
+    service_obj = get_object_or_404(Service, id=service_id)
     trainer_obj = service_obj.trainer
     if request.method == 'GET':
         start_date  = (timezone.now() + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
