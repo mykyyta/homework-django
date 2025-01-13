@@ -193,16 +193,3 @@ class TrainerTestCase(TestCase):
         self.assertEqual(trainer_schedule.trainer, self.trainer)
         self.assertEqual(trainer_schedule.datetime_start, datetime_start)
         self.assertEqual(trainer_schedule.datetime_end, datetime_end)
-
-
-
-
-
-
-
-
-
-
-
-
-
