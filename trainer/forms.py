@@ -2,8 +2,6 @@ from django import forms
 from .models import Service, TrainerDescription, TrainerSchedule
 
 
-
-
 class ServiceForm(forms.ModelForm):
     class Meta:
         model = Service
@@ -17,7 +15,6 @@ class ServiceForm(forms.ModelForm):
     ]
 
     level = forms.ChoiceField(choices=level_choices)
-
 
 class TrainerDescriptionForm(forms.ModelForm):
     class Meta:

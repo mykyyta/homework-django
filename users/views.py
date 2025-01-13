@@ -5,7 +5,6 @@ from django.contrib.auth.models import User, Group
 from django.shortcuts import render, redirect
 from .forms import RegisterForm, LoginForm
 
-
 def user_page(request):
     return redirect('index_page')
 
@@ -17,9 +16,11 @@ def login_page(request):
     if request.method == "POST":
         login_form = LoginForm(request.POST)
         if login_form.is_valid():
-            username = login_form.cleaned_data['username']
-            password = login_form.cleaned_data['password']
-            user = authenticate(username=username, password=password)
+            user = authenticate(
+                request,
+                username=login_form.cleaned_data['username'],
+                password=login_form.cleaned_data['password']
+                )
             if user is not None:
                 login(request, user)
                 return redirect('index_page')
@@ -37,18 +38,16 @@ def logout_page(request):
     return HttpResponse("You are not logged in")
 
 def register(request, user_type):
-    if request.method == 'POST':
-        form = RegisterForm(request.POST)
-        if form.is_valid():
-            user = User.objects.create_user(**form.cleaned_data)
-            group_name = 'trainer' if user_type == 'trainer' else 'client'
-            user.groups.add(Group.objects.get(name=group_name))
-            return redirect('login_page')
-        else:
-            return render(request, 'register.html', {'form': form})
-    else:
-        form = RegisterForm()
-        return render(request, 'register.html', {'form': form, 'user_type': user_type})
+    form = RegisterForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        user = form.save(commit=False)
+        user.set_password(form.cleaned_data['password'])
+        user.save()
+        group_name = 'trainer' if user_type == 'trainer' else 'client'
+        user.groups.add(Group.objects.get(name=group_name))
+        return redirect('login_page')
+
+    return render(request, 'register.html', {'form': form, 'user_type': user_type})
 
 def index_page(request):
     return render(request, 'index.html')

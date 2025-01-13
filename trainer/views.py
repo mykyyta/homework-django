@@ -24,15 +24,11 @@ def specific_trainer(request, trainer_id):
             if 'trainer_description' in request.POST:
                 trainer_description_form = TrainerDescriptionForm(request.POST)
                 if trainer_description_form.is_valid():
-                    trainer_description, created = TrainerDescription.objects.get_or_create(
-                                                                    trainer=current_trainer,
-                                                                    defaults=trainer_description_form.cleaned_data
-                                                                    )
-                    if not created:
-                        trainer_description.name = trainer_description_form.cleaned_data['name']
-                        trainer_description.save()
+                    TrainerDescription.objects.update_or_create(
+                                                                trainer=current_trainer,
+                                                                defaults=trainer_description_form.cleaned_data
+                                                                )
                     return redirect('specific_trainer', trainer_id)
-
             elif 'trainer_schedule' in request.POST:
                 trainer_schedule_form = TrainerScheduleForm(request.POST)
                 if trainer_schedule_form.is_valid():
